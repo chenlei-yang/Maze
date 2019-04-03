@@ -3,8 +3,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.cm as cm
 from collections import deque
-import tkinter
-
 
 def show_maze(Maze):
     plt.imshow(Maze, cmap=cm.Wistia_r, interpolation='none')
@@ -48,7 +46,45 @@ def find_path_bfs(image, M):
             path[nr + 1][nc][1] = nc
 
 
-def Create_maze_prim():
+def find_path_dfs(image, M):
+    path = np.zeros((num_rows, num_cols, 2))
+    vis = np.zeros((num_rows, num_cols))
+    vis[0][0] = 1
+    def dfs(pos):
+        nr = pos[0];
+        nc = pos[1];
+        if (nc == num_cols - 1) and (nr == num_rows - 1):
+            show_path(image, path)
+            return
+        if (nc > 0) and (not vis[nr][nc - 1]) and (M[nr][nc][0]):
+            vis[nr][nc] = 1
+            path[nr][nc - 1][0] = nr
+            path[nr][nc - 1][1] = nc
+            dfs((nr, nc - 1))
+            vis[nr][nc] = 0
+        if (nr > 0) and (not vis[nr - 1][nc]) and (M[nr][nc][1]):
+            vis[nr][nc] = 1
+            path[nr - 1][nc][0] = nr
+            path[nr - 1][nc][1] = nc
+            dfs((nr - 1, nc))
+            vis[nr][nc] = 0
+        if (nc < num_cols - 1) and (not vis[nr][nc + 1]) and (M[nr][nc][2]):
+            vis[nr][nc] = 1
+            path[nr][nc + 1][0] = nr
+            path[nr][nc + 1][1] = nc
+            dfs((nr, nc + 1))
+            vis[nr][nc] = 0
+        if (nr < num_rows - 1) and (not vis[nr + 1][nc]) and (M[nr][nc][3]):
+            path[nr + 1][nc][0] = nr
+            path[nr + 1][nc][1] = nc
+            vis[nr][nc] = 1
+            dfs((nr + 1, nc))
+            vis[nr][nc] = 0
+
+    dfs((0,0))
+
+
+def Create_maze_dfs():
     M = np.zeros((num_rows, num_cols, 5))
     image = np.zeros((num_rows * 10, num_cols * 10))
 
@@ -113,7 +149,7 @@ def Create_maze_prim():
     return M, image
 
 
-def Create_maze_dfs():
+def Create_maze_prim():
     M = np.zeros((num_rows, num_cols, 5))
     image = np.zeros((num_rows * 10, num_cols * 10))
 
@@ -349,9 +385,11 @@ if __name__ == '__main__':
     image = np.zeros((num_rows * 10, num_cols * 10))
     # row_image = np.zeros((num_rows * 10, num_cols * 10))
 
-    M, image = Create_maze_prim()
+    # M, image = Create_maze_prim()
+    M, image = Create_maze_dfs()
 
     # show_maze(image)
-    find_path_bfs(image, M)
+    # find_path_bfs(image, M)
+    find_path_dfs(image, M)
 
     # show_path(image, path)
